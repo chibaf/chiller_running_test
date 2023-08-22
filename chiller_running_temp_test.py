@@ -16,28 +16,40 @@ if len(sys.argv) ==2: # open an output file as name=sys.argv[1]
 temps=[0]*100
 settemp=[25]*100
 x=range(0, 100, 1)
-S1_25=b'\x04\x30\x30\x02\x53\x31\x20\x20\x20\x20\x32\x35\x2E\x30\x03\x70'
-S1_35=b'\x04\x30\x30\x02\x53\x31\x20\x20\x20\x20\x33\x35\x2E\x30\x03\x70'
+S1_25=b'\x04\x30\x30\x02\x53\x31\x20\x20\x20\x20\x32\x35\x2E\x30\x03\x7D'
+S1_35=b'\x04\x30\x30\x02\x53\x31\x20\x20\x20\x20\x33\x35\x2E\x30\x03\x7D'
 request_00M1 = b'\x04\x30\x30\x4D\x31\x05'
+request_00S1 = b'\x04\x30\x30\x53\x31\x05'
 flag=0
-itime=0
+itime=2
 temp0=25
 while True:
   try:
-    ser.write(request_00M1)
-    if itime==20:
-      if flag==0:
-        temp0=25
-        flag=1
-        ser.write(S1_25)
-      else:
-        flag=0
-        temp0=35
-        ser.write(S1_35)
+    ser.write(request_00S1)
+    line01 = ser.readline()  
+    line02 = line01.strip().decode("utf-8")
+    print(line02)
+    if itime==2:
+      ser.write(S1_25)
+#      if flag==0:
+#        temp0=25
+#        flag=1
+#        ser.write(S1_25)
+#        ret=ser.readline()
+#        ret0=ret.strip().decode("utf-8")
+#        print(ret0)
+#      else:
+#        flag=0
+#        temp0=35
+#        ser.write(S1_35)
+#        ret=ser.readline()
+#        ret0=ret.strip().decode("utf-8")
+#        print(ret0)
       itime=0
     else:
       itime=itime+1
     time.sleep(1)
+    ser.write(request_00M1)
     line = ser.readline()  
     line2 = line.strip().decode("utf-8")
     line3 = line2.split( )    # split string
@@ -49,7 +61,7 @@ while True:
     settemp.insert(0,float(temp0))
     if len(sys.argv) ==2: # write data to file
       f.write(str(temps[0])+"\n")    
-    print(str(temp0)+", "+str(temps[0]))      
+    print(line02+", "+str(temps[0]))      
     plt.clf()
     plt.plot(x,temps)
     plt.plot(x,settemp)
